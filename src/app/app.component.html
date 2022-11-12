@@ -1,15 +1,16 @@
 <div class="content-container">
   <div class="map-container">
     <button *ngFor="let item of playerMap">
-      <img src="assets/images/ocean.gif" alt="" />
-      <img src="assets/images/player.png" alt="" />
-      <img src="assets/images/sunk.gif" alt="" />
+      <div *ngFor="let src of item">
+        <img src="{{ src }}" alt="" />
+      </div>
     </button>
   </div>
   <div class="map-container">
     <button *ngFor="let item of opponentMap">
-      <img src="assets/images/ocean.gif" alt="" />
-      <img src="assets/images/miss.gif" alt="" />
+      <div *ngFor="let src of item">
+        <img src="{{ src }}" alt="" />
+      </div>
     </button>
   </div>
 </div>

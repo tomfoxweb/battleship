@@ -16,6 +16,7 @@ interface ImageUrl {
 
 interface GameImage {
   type: GameImageType;
+  url: string;
   image: HTMLImageElement;
 }
 
@@ -24,11 +25,13 @@ interface GameImage {
 })
 export class ImageProviderService {
   private images: Map<GameImageType, HTMLImageElement>;
-  private imageUrls: ImageUrl[];
+  private imagesUrlsMap: Map<GameImageType, string>;
+  private imageUrlsArray: ImageUrl[];
 
   constructor() {
     this.images = new Map();
-    this.imageUrls = [
+    this.imagesUrlsMap = new Map();
+    this.imageUrlsArray = [
       { type: GameImageType.ocean, url: 'assets/images/ocean.gif' },
       { type: GameImageType.miss, url: 'assets/images/miss.gif' },
       { type: GameImageType.hit, url: 'assets/images/hit.gif' },
@@ -40,22 +43,23 @@ export class ImageProviderService {
 
   async loadImages() {
     const imagePromises: Promise<GameImage>[] = [];
-    for (const imageUrl of this.imageUrls) {
+    for (const imageUrl of this.imageUrlsArray) {
       imagePromises.push(
         new Promise<GameImage>(async (resolve) => {
           const image = await this.loadImage(imageUrl.url);
-          resolve({ type: imageUrl.type, image: image });
+          resolve({ type: imageUrl.type, url: imageUrl.url, image: image });
         })
       );
     }
     const gameImages = await Promise.all(imagePromises);
     gameImages.forEach((gameImage) => {
       this.images.set(gameImage.type, gameImage.image);
+      this.imagesUrlsMap.set(gameImage.type, gameImage.url);
     });
   }
 
   getImage(imageType: GameImageType) {
-    return this.images.get(imageType)!;
+    return this.imagesUrlsMap.get(imageType)!;
   }
 
   private loadImage(url: string): Promise<HTMLImageElement> {

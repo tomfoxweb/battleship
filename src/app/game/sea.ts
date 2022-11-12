@@ -3,6 +3,7 @@ export type Column = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 
 export const ROW_COUNT = 10;
 export const COLUMN_COUNT = 10;
+export const CELL_COUNT = ROW_COUNT * COLUMN_COUNT;
 
 export const enum Cell {
   empty,
