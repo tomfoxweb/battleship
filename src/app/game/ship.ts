@@ -1,37 +1,45 @@
 import { Position } from './sea';
 
-export const enum PartState {
+export const enum ShipState {
   good,
   hit,
   sunk,
 }
 
 export class Ship {
-  private positions: Position[];
-  private partStates: PartState[];
-  private state: PartState;
+  private sectionsPositions: Position[];
+  private sectionsStates: ShipState[];
+  private shipState: ShipState;
 
-  constructor(positions: Position[]) {
-    this.positions = positions;
-    this.state = PartState.good;
-    this.partStates = this.positions.map(() => PartState.good);
+  constructor(sectionsPositions: Position[]) {
+    this.sectionsPositions = sectionsPositions;
+    this.shipState = ShipState.good;
+    this.sectionsStates = this.sectionsPositions.map(() => ShipState.good);
   }
 
   hit(hitPosition: Position) {
-    const partIndex = this.positions.findIndex(
-      (x) => x.row === hitPosition.row && x.column === hitPosition.column
-    );
-    if (partIndex < 0) {
+    if (this.shipState === ShipState.sunk) {
       return;
     }
-    this.partStates[partIndex] = PartState.hit;
-    if (this.partStates.every((partState) => partState === PartState.hit)) {
-      this.partStates.fill(PartState.sunk);
-      this.state = PartState.sunk;
+    const sectionIndex = this.sectionsPositions.findIndex(
+      (x) => x.row === hitPosition.row && x.column === hitPosition.column
+    );
+    if (sectionIndex < 0) {
+      return;
+    }
+    this.sectionsStates[sectionIndex] = ShipState.hit;
+    this.shipState = ShipState.hit;
+    if (this.sectionsStates.every((state) => state === ShipState.hit)) {
+      this.sectionsStates.fill(ShipState.sunk);
+      this.shipState = ShipState.sunk;
     }
   }
 
   getState() {
-    return this.state;
+    return this.shipState;
+  }
+
+  getSectionsPositions() {
+    return this.sectionsPositions;
   }
 }

@@ -1,4 +1,4 @@
-import { Ship } from './ship';
+import { Ship, ShipState } from './ship';
 import { Viewable } from './viewable';
 
 export type Row = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
@@ -12,19 +12,9 @@ export const ROW_COUNT = 10;
 export const COLUMN_COUNT = 10;
 export const CELL_COUNT = ROW_COUNT * COLUMN_COUNT;
 
-export const enum ShipType {
-  battleship,
-  destroyer,
-  submarine,
-  boat,
-}
-
-export const enum CellType {
+export const enum Cell {
   empty,
-  battleship,
-  destroyer,
-  submarine,
-  boat,
+  ship,
   miss,
   hit,
   sunk,
@@ -35,66 +25,72 @@ export type SeaIndex = 0 | 1;
 export class Sea {
   private view: Viewable;
   private seaIndex: SeaIndex;
-  private gameMap: CellType[][];
+  private gameMap: Cell[][];
   private ships: Ship[];
-  private shipMap: Map<Position, number>;
+  private shipMap: (Ship | null)[][];
 
   constructor(view: Viewable, seaIndex: SeaIndex) {
     this.view = view;
     this.seaIndex = seaIndex;
     this.gameMap = [];
+    this.shipMap = [];
     for (let row = 0; row < ROW_COUNT; row++) {
       this.gameMap.push([]);
+      this.shipMap.push([]);
       for (let column = 0; column < COLUMN_COUNT; column++) {
-        this.gameMap[row].push(CellType.empty);
+        this.gameMap[row].push(Cell.empty);
+        this.shipMap[row].push(null);
         this.view.showEmptyCell(row as Row, column as Column, this.seaIndex);
       }
     }
     this.ships = [];
-    this.shipMap = new Map();
   }
 
   clear() {
     for (let row = 0; row < ROW_COUNT; row++) {
       for (let column = 0; column < COLUMN_COUNT; column++) {
-        this.gameMap[row][column] = CellType.empty;
+        this.gameMap[row][column] = Cell.empty;
+        this.shipMap[row][column] = null;
         this.view.showEmptyCell(row as Row, column as Column, this.seaIndex);
       }
     }
+    this.ships = [];
   }
 
-  addShip(positions: Position[], shipType: ShipType) {
-    let cellType = CellType.boat;
-    switch (shipType) {
-      case ShipType.battleship:
-        cellType = CellType.battleship;
-        break;
-      case ShipType.destroyer:
-        cellType = CellType.destroyer;
-        break;
-      case ShipType.submarine:
-        cellType = CellType.submarine;
-        break;
-      case ShipType.boat:
-        cellType = CellType.boat;
-        break;
-    }
-    this.ships.push(new Ship(positions));
+  addShip(positions: Position[]) {
+    const ship = new Ship(positions);
+    this.ships.push(ship);
     positions.forEach((position) => {
-      this.gameMap[position.row][position.column] = cellType;
-      this.shipMap.set(position, this.ships.length - 1);
+      this.gameMap[position.row][position.column] = Cell.ship;
+      this.shipMap[position.row][position.column] = ship;
       this.view.showShipCell(position.row, position.column, this.seaIndex);
     });
   }
 
   hit(row: Row, column: Column) {
-    const shipIndex = this.shipMap.get({ row, column });
-    if (shipIndex === undefined) {
-      this.gameMap[row][column] = CellType.miss;
-      this.view.showMissCell(row, column, this.seaIndex);
+    const ship = this.shipMap[row][column];
+    if (ship === null) {
+      this.processMissHit(row, column);
     } else {
-      const ship = this.ships[shipIndex];
-      ship.hit({ row, column });
+      this.processSuccessHit(row, column, ship);
+    }
+  }
+
+  private processMissHit(row: Row, column: Column) {
+    this.gameMap[row][column] = Cell.miss;
+    this.view.showMissCell(row, column, this.seaIndex);
+  }
+
+  private processSuccessHit(row: Row, column: Column, ship: Ship) {
+    ship.hit({ row, column });
+    const shipState = ship.getState();
+    if (shipState === ShipState.hit) {
+      this.view.showHitCell(row, column, this.seaIndex);
+    } else if (shipState === ShipState.sunk) {
+      const shipPartsPositions = ship.getSectionsPositions();
+      shipPartsPositions.forEach((position) => {
+        this.view.showSunkCell(position.row, position.column, this.seaIndex);
+      });
     }
   }
 }

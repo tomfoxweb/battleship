@@ -11,7 +11,7 @@ import {
 import { Viewable } from './game/viewable';
 import { GameImageType, ImageProviderService } from './image-provider.service';
 
-interface Cell {
+interface ImageCell {
   row: Row;
   column: Column;
   imageUrls: string[];
@@ -24,8 +24,8 @@ interface Cell {
 })
 export class AppComponent implements OnInit, Viewable {
   title = 'battleship';
-  playerMap = new Array<Cell>(CELL_COUNT);
-  opponentMap = new Array<Cell>(CELL_COUNT);
+  playerMap = new Array<ImageCell>(CELL_COUNT);
+  opponentMap = new Array<ImageCell>(CELL_COUNT);
   private game: Game | undefined;
 
   constructor(private imageProvider: ImageProviderService) {}
