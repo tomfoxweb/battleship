@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Game } from './game/game';
 import {
   CELL_COUNT,
   Column,
@@ -19,6 +20,7 @@ export class AppComponent implements OnInit, Viewable {
   title = 'battleship';
   playerMap = new Array<string[]>(CELL_COUNT);
   opponentMap = new Array<string[]>(CELL_COUNT);
+  private game: Game | undefined;
 
   constructor(private imageProvider: ImageProviderService) {}
 
@@ -32,6 +34,8 @@ export class AppComponent implements OnInit, Viewable {
         this.opponentMap[index] = [oceanImageUrl];
       }
     }
+    this.game = new Game(this);
+    this.game.restart();
   }
 
   showEmptyCell(row: Row, column: Column, seaIndex: SeaIndex): void {
@@ -69,7 +73,7 @@ export class AppComponent implements OnInit, Viewable {
 
   showHitCell(row: Row, column: Column, seaIndex: SeaIndex): void {
     const oceanImageUrl = this.imageProvider.getImage(GameImageType.ocean);
-    const hitImageUrl = this.imageProvider.getImage(GameImageType.miss);
+    const hitImageUrl = this.imageProvider.getImage(GameImageType.hit);
     const index = row * COLUMN_COUNT + column;
     if (seaIndex === 0) {
       const shipUrl = this.imageProvider.getImage(GameImageType.player);
