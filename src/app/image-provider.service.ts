@@ -32,7 +32,7 @@ export class ImageProviderService {
     this.images = new Map();
     this.imagesUrlsMap = new Map();
     this.imageUrlsArray = [
-      { type: GameImageType.ocean, url: 'assets/images/ocean.gif' },
+      { type: GameImageType.ocean, url: 'assets/images/ocean.png' },
       { type: GameImageType.miss, url: 'assets/images/miss.gif' },
       { type: GameImageType.hit, url: 'assets/images/hit.gif' },
       { type: GameImageType.sunk, url: 'assets/images/sunk.gif' },

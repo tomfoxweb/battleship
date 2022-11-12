@@ -11,13 +11,14 @@ $content-max-width: 1200px;
     display: grid;
     grid-template-columns: repeat(10, 1fr);
     justify-content: center;
-    border: 1px solid green;
 
     button {
       margin: 0;
       padding: 0;
       cursor: pointer;
       border: none;
+      border-right: 1px solid gold;
+      border-bottom: 1px solid gold;
       display: grid;
       grid-template-columns: 1fr;
       grid-template-rows: 1fr;
