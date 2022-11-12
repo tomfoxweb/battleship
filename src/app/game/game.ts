@@ -1,4 +1,4 @@
-import { Column, COLUMN_COUNT, Row, ROW_COUNT, Sea } from './sea';
+import { Column, Row, Sea, SeaIndex, ShipType } from './sea';
 import { Viewable } from './viewable';
 
 export class Game {
@@ -8,16 +8,21 @@ export class Game {
 
   constructor(view: Viewable) {
     this.view = view;
-    this.playerSea = new Sea();
-    this.opponentSea = new Sea();
+    this.playerSea = new Sea(this.view, 0);
+    this.opponentSea = new Sea(this.view, 1);
+    this.playerSea.addShip([{ row: 0, column: 0 }], ShipType.boat);
   }
 
   restart() {
-    for (let row = 0; row < ROW_COUNT; row++) {
-      for (let column = 0; column < COLUMN_COUNT; column++) {
-        this.view.showSunkCell(row as Row, column as Column, 0);
-        this.view.showHitCell(row as Row, column as Column, 1);
-      }
+    this.playerSea.clear();
+    this.opponentSea.clear();
+  }
+
+  hit(row: Row, column: Column, seaIndex: SeaIndex) {
+    if (seaIndex === 0) {
+      this.playerSea.hit(row, column);
+    } else {
+      this.opponentSea.hit(row, column);
     }
   }
 }

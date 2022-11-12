@@ -1,15 +1,21 @@
 <div class="content-container">
   <div class="map-container">
-    <button *ngFor="let item of playerMap">
-      <div *ngFor="let src of item">
-        <img src="{{ src }}" alt="" />
+    <button
+      *ngFor="let item of playerMap"
+      (click)="hit(item.row, item.column, 0)"
+    >
+      <div *ngFor="let url of item.imageUrls">
+        <img src="{{ url }}" alt="" />
       </div>
     </button>
   </div>
   <div class="map-container">
-    <button *ngFor="let item of opponentMap">
-      <div *ngFor="let src of item">
-        <img src="{{ src }}" alt="" />
+    <button
+      *ngFor="let item of opponentMap"
+      (click)="hit(item.row, item.column, 1)"
+    >
+      <div *ngFor="let url of item.imageUrls">
+        <img src="{{ url }}" alt="" />
       </div>
     </button>
   </div>

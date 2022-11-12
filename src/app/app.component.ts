@@ -11,6 +11,12 @@ import {
 import { Viewable } from './game/viewable';
 import { GameImageType, ImageProviderService } from './image-provider.service';
 
+interface Cell {
+  row: Row;
+  column: Column;
+  imageUrls: string[];
+}
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -18,33 +24,46 @@ import { GameImageType, ImageProviderService } from './image-provider.service';
 })
 export class AppComponent implements OnInit, Viewable {
   title = 'battleship';
-  playerMap = new Array<string[]>(CELL_COUNT);
-  opponentMap = new Array<string[]>(CELL_COUNT);
+  playerMap = new Array<Cell>(CELL_COUNT);
+  opponentMap = new Array<Cell>(CELL_COUNT);
   private game: Game | undefined;
 
   constructor(private imageProvider: ImageProviderService) {}
 
   async ngOnInit() {
-    await this.imageProvider.loadImages();
-    const oceanImageUrl = this.imageProvider.getImage(GameImageType.ocean);
     for (let row = 0; row < ROW_COUNT; row++) {
       for (let column = 0; column < COLUMN_COUNT; column++) {
         const index = row * COLUMN_COUNT + column;
-        this.playerMap[index] = [oceanImageUrl];
-        this.opponentMap[index] = [oceanImageUrl];
+        this.playerMap[index] = {
+          row: row as Row,
+          column: column as Column,
+          imageUrls: [],
+        };
+        this.opponentMap[index] = {
+          row: row as Row,
+          column: column as Column,
+          imageUrls: [],
+        };
       }
     }
+    await this.imageProvider.loadImages();
+    const oceanImageUrl = this.imageProvider.getImage(GameImageType.ocean);
     this.game = new Game(this);
-    this.game.restart();
+  }
+
+  hit(row: Row, column: Column, seaIndex: SeaIndex) {
+    if (this.game) {
+      this.game.hit(row, column, seaIndex);
+    }
   }
 
   showEmptyCell(row: Row, column: Column, seaIndex: SeaIndex): void {
     const oceanImageUrl = this.imageProvider.getImage(GameImageType.ocean);
     const index = row * COLUMN_COUNT + column;
     if (seaIndex === 0) {
-      this.playerMap[index] = [oceanImageUrl];
+      this.playerMap[index].imageUrls = [oceanImageUrl];
     } else {
-      this.opponentMap[index] = [oceanImageUrl];
+      this.opponentMap[index].imageUrls = [oceanImageUrl];
     }
   }
 
@@ -53,10 +72,10 @@ export class AppComponent implements OnInit, Viewable {
     const index = row * COLUMN_COUNT + column;
     if (seaIndex === 0) {
       const shipUrl = this.imageProvider.getImage(GameImageType.player);
-      this.playerMap[index] = [oceanImageUrl, shipUrl];
+      this.playerMap[index].imageUrls = [oceanImageUrl, shipUrl];
     } else {
       const shipUrl = this.imageProvider.getImage(GameImageType.opponent);
-      this.opponentMap[index] = [oceanImageUrl, shipUrl];
+      this.opponentMap[index].imageUrls = [oceanImageUrl, shipUrl];
     }
   }
 
@@ -65,9 +84,9 @@ export class AppComponent implements OnInit, Viewable {
     const missImageUrl = this.imageProvider.getImage(GameImageType.miss);
     const index = row * COLUMN_COUNT + column;
     if (seaIndex === 0) {
-      this.playerMap[index] = [oceanImageUrl, missImageUrl];
+      this.playerMap[index].imageUrls = [oceanImageUrl, missImageUrl];
     } else {
-      this.opponentMap[index] = [oceanImageUrl, missImageUrl];
+      this.opponentMap[index].imageUrls = [oceanImageUrl, missImageUrl];
     }
   }
 
@@ -77,10 +96,10 @@ export class AppComponent implements OnInit, Viewable {
     const index = row * COLUMN_COUNT + column;
     if (seaIndex === 0) {
       const shipUrl = this.imageProvider.getImage(GameImageType.player);
-      this.playerMap[index] = [oceanImageUrl, shipUrl, hitImageUrl];
+      this.playerMap[index].imageUrls = [oceanImageUrl, shipUrl, hitImageUrl];
     } else {
       const shipUrl = this.imageProvider.getImage(GameImageType.opponent);
-      this.opponentMap[index] = [oceanImageUrl, shipUrl, hitImageUrl];
+      this.opponentMap[index].imageUrls = [oceanImageUrl, shipUrl, hitImageUrl];
     }
   }
 
@@ -90,10 +109,14 @@ export class AppComponent implements OnInit, Viewable {
     const index = row * COLUMN_COUNT + column;
     if (seaIndex === 0) {
       const shipUrl = this.imageProvider.getImage(GameImageType.player);
-      this.playerMap[index] = [oceanImageUrl, shipUrl, sunkImageUrl];
+      this.playerMap[index].imageUrls = [oceanImageUrl, shipUrl, sunkImageUrl];
     } else {
       const shipUrl = this.imageProvider.getImage(GameImageType.opponent);
-      this.opponentMap[index] = [oceanImageUrl, shipUrl, sunkImageUrl];
+      this.opponentMap[index].imageUrls = [
+        oceanImageUrl,
+        shipUrl,
+        sunkImageUrl,
+      ];
     }
   }
 }

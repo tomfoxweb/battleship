@@ -1,4 +1,5 @@
 import { Ship } from './ship';
+import { Viewable } from './viewable';
 
 export type Row = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 export type Column = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
@@ -32,16 +33,21 @@ export const enum CellType {
 export type SeaIndex = 0 | 1;
 
 export class Sea {
+  private view: Viewable;
+  private seaIndex: SeaIndex;
   private gameMap: CellType[][];
   private ships: Ship[];
   private shipMap: Map<Position, number>;
 
-  constructor() {
+  constructor(view: Viewable, seaIndex: SeaIndex) {
+    this.view = view;
+    this.seaIndex = seaIndex;
     this.gameMap = [];
     for (let row = 0; row < ROW_COUNT; row++) {
       this.gameMap.push([]);
       for (let column = 0; column < COLUMN_COUNT; column++) {
         this.gameMap[row].push(CellType.empty);
+        this.view.showEmptyCell(row as Row, column as Column, this.seaIndex);
       }
     }
     this.ships = [];
@@ -52,6 +58,7 @@ export class Sea {
     for (let row = 0; row < ROW_COUNT; row++) {
       for (let column = 0; column < COLUMN_COUNT; column++) {
         this.gameMap[row][column] = CellType.empty;
+        this.view.showEmptyCell(row as Row, column as Column, this.seaIndex);
       }
     }
   }
@@ -76,6 +83,7 @@ export class Sea {
     positions.forEach((position) => {
       this.gameMap[position.row][position.column] = cellType;
       this.shipMap.set(position, this.ships.length - 1);
+      this.view.showShipCell(position.row, position.column, this.seaIndex);
     });
   }
 
@@ -83,6 +91,7 @@ export class Sea {
     const shipIndex = this.shipMap.get({ row, column });
     if (shipIndex === undefined) {
       this.gameMap[row][column] = CellType.miss;
+      this.view.showMissCell(row, column, this.seaIndex);
     } else {
       const ship = this.ships[shipIndex];
       ship.hit({ row, column });
