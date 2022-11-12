@@ -1,11 +1,15 @@
-import { Column, COLUMN_COUNT, Row, ROW_COUNT } from './sea';
+import { Column, COLUMN_COUNT, Row, ROW_COUNT, Sea } from './sea';
 import { Viewable } from './viewable';
 
 export class Game {
   private view: Viewable;
+  private playerSea: Sea;
+  private opponentSea: Sea;
 
   constructor(view: Viewable) {
     this.view = view;
+    this.playerSea = new Sea();
+    this.opponentSea = new Sea();
   }
 
   restart() {

@@ -17,8 +17,11 @@ export class Ship {
     this.partStates = this.positions.map(() => PartState.good);
   }
 
-  hit(partIndex: number) {
-    if (partIndex < 0 || partIndex >= this.partStates.length) {
+  hit(hitPosition: Position) {
+    const partIndex = this.positions.findIndex(
+      (x) => x.row === hitPosition.row && x.column === hitPosition.column
+    );
+    if (partIndex < 0) {
       return;
     }
     this.partStates[partIndex] = PartState.hit;
