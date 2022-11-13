@@ -25,7 +25,7 @@ export type SeaIndex = 0 | 1;
 export class Sea {
   private view: Viewable;
   private seaIndex: SeaIndex;
-  private gameMap: Cell[][];
+  private hitMap: Cell[][];
   private ships: Ship[];
   private shipMap: (Ship | null)[][];
   private readonly shipSizes = [4, 3, 3, 2, 2, 2, 1, 1, 1, 1];
@@ -33,13 +33,13 @@ export class Sea {
   constructor(view: Viewable, seaIndex: SeaIndex) {
     this.view = view;
     this.seaIndex = seaIndex;
-    this.gameMap = [];
+    this.hitMap = [];
     this.shipMap = [];
     for (let row = 0; row < ROW_COUNT; row++) {
-      this.gameMap.push([]);
+      this.hitMap.push([]);
       this.shipMap.push([]);
       for (let column = 0; column < COLUMN_COUNT; column++) {
-        this.gameMap[row].push(Cell.empty);
+        this.hitMap[row].push(Cell.empty);
         this.shipMap[row].push(null);
         this.view.showEmptyCell(row as Row, column as Column, this.seaIndex);
       }
@@ -50,7 +50,7 @@ export class Sea {
   clear() {
     for (let row = 0; row < ROW_COUNT; row++) {
       for (let column = 0; column < COLUMN_COUNT; column++) {
-        this.gameMap[row][column] = Cell.empty;
+        this.hitMap[row][column] = Cell.empty;
         this.shipMap[row][column] = null;
         this.view.showEmptyCell(row as Row, column as Column, this.seaIndex);
       }
@@ -58,11 +58,11 @@ export class Sea {
     this.ships = [];
   }
 
-  addShip(positions: Position[]) {
-    const ship = new Ship(positions);
+  placeShip(shipPartsPositions: Position[]) {
+    const ship = new Ship(shipPartsPositions);
     this.ships.push(ship);
-    positions.forEach((position) => {
-      this.gameMap[position.row][position.column] = Cell.ship;
+    shipPartsPositions.forEach((position) => {
+      this.hitMap[position.row][position.column] = Cell.ship;
       this.shipMap[position.row][position.column] = ship;
       this.view.showShipCell(position.row, position.column, this.seaIndex);
     });
@@ -78,7 +78,7 @@ export class Sea {
   }
 
   private processMissHit(row: Row, column: Column) {
-    this.gameMap[row][column] = Cell.miss;
+    this.hitMap[row][column] = Cell.miss;
     this.view.showMissCell(row, column, this.seaIndex);
   }
 
@@ -95,56 +95,56 @@ export class Sea {
     }
   }
 
-  placeOrdered() {
+  placeInOrder() {
     this.clear();
-    this.addShip([
+    this.placeShip([
       { row: 1, column: 1 },
       { row: 1, column: 2 },
       { row: 1, column: 3 },
       { row: 1, column: 4 },
     ]);
-    this.addShip([
+    this.placeShip([
       { row: 3, column: 1 },
       { row: 3, column: 2 },
       { row: 3, column: 3 },
     ]);
-    this.addShip([
+    this.placeShip([
       { row: 3, column: 5 },
       { row: 3, column: 6 },
       { row: 3, column: 7 },
     ]);
-    this.addShip([
+    this.placeShip([
       { row: 5, column: 1 },
       { row: 5, column: 2 },
     ]);
-    this.addShip([
+    this.placeShip([
       { row: 5, column: 4 },
       { row: 5, column: 5 },
     ]);
-    this.addShip([
+    this.placeShip([
       { row: 5, column: 7 },
       { row: 5, column: 8 },
     ]);
-    this.addShip([{ row: 7, column: 1 }]);
-    this.addShip([{ row: 7, column: 3 }]);
-    this.addShip([{ row: 7, column: 5 }]);
-    this.addShip([{ row: 7, column: 7 }]);
+    this.placeShip([{ row: 7, column: 1 }]);
+    this.placeShip([{ row: 7, column: 3 }]);
+    this.placeShip([{ row: 7, column: 5 }]);
+    this.placeShip([{ row: 7, column: 7 }]);
   }
 
-  placeRandom() {
+  placeRandomly() {
     this.clear();
     this.shipSizes.forEach((size) => {
       const positions = this.calcRandomShipPositions(size);
       const randIndex = Math.trunc(Math.random() * positions.length);
-      const randPositions = positions[randIndex];
-      this.addShip(randPositions);
+      const shipPartsPositions = positions[randIndex];
+      this.placeShip(shipPartsPositions);
     });
   }
 
   calcRandomShipPositions(shipSize: number): Position[][] {
     const horizontalPositions = this.calcRandomHorizontalPositions(shipSize);
     const verticalPositions = this.calcRandomVerticalPositions(shipSize);
-    return horizontalPositions.concat(verticalPositions);
+    return [...horizontalPositions, ...verticalPositions];
   }
 
   calcRandomHorizontalPositions(shipSize: number): Position[][] {
@@ -157,7 +157,7 @@ export class Sea {
           const currRow: Row = row as Row;
           const currCol: Column = (col + i) as Column;
           currPositions.push({ row: currRow, column: currCol });
-          if (!this.canPlaceShip(currRow, currCol)) {
+          if (!this.isPlaceablePosition(currRow, currCol)) {
             goodPosition = false;
             break;
           }
@@ -174,18 +174,18 @@ export class Sea {
     const positions: Position[][] = [];
     for (let row = 0; row <= ROW_COUNT - shipSize; row++) {
       for (let col = 0; col < COLUMN_COUNT; col++) {
-        let goodPosition = true;
+        let placeablePosition = true;
         const currPositions: Position[] = [];
         for (let i = 0; i < shipSize; i++) {
           const currRow: Row = (row + i) as Row;
           const currCol: Column = col as Column;
           currPositions.push({ row: currRow, column: currCol });
-          if (!this.canPlaceShip(currRow, currCol)) {
-            goodPosition = false;
+          if (!this.isPlaceablePosition(currRow, currCol)) {
+            placeablePosition = false;
             break;
           }
         }
-        if (goodPosition) {
+        if (placeablePosition) {
           positions.push(currPositions);
         }
       }
@@ -193,7 +193,7 @@ export class Sea {
     return positions;
   }
 
-  private canPlaceShip(rowStart: Row, columnStart: Column): boolean {
+  private isPlaceablePosition(rowStart: Row, columnStart: Column): boolean {
     const aroundPositions: Position[] = [];
     for (let row = rowStart - 1; row <= rowStart + 1; row++) {
       for (let col = columnStart - 1; col <= columnStart + 1; col++) {

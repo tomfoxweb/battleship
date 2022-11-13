@@ -50,15 +50,15 @@ export class AppComponent implements OnInit, Viewable {
     this.game = new Game(this);
   }
 
-  setOrderedPositions() {
+  placePlayerShipsInOrder() {
     if (this.game) {
-      this.game.setOrderedPositions();
+      this.game.placePlayerShipsInOrder();
     }
   }
 
-  setRandomPositions() {
+  placeOpponentShipRandomly() {
     if (this.game) {
-      this.game.setRandomPositions();
+      this.game.placeOpponentShipsRandomly();
     }
   }
 

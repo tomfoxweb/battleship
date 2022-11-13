@@ -10,23 +10,8 @@ export class Game {
     this.view = view;
     this.playerSea = new Sea(this.view, 0);
     this.opponentSea = new Sea(this.view, 1);
-    this.playerSea.addShip([{ row: 8, column: 3 }]);
-    this.playerSea.addShip([
-      { row: 2, column: 6 },
-      { row: 2, column: 7 },
-    ]);
-    this.playerSea.addShip([
-      { row: 2, column: 1 },
-      { row: 3, column: 1 },
-      { row: 4, column: 1 },
-    ]);
-    this.playerSea.addShip([
-      { row: 5, column: 5 },
-      { row: 5, column: 6 },
-      { row: 5, column: 7 },
-      { row: 5, column: 8 },
-    ]);
-    this.opponentSea.placeRandom();
+    this.playerSea.placeInOrder();
+    this.opponentSea.placeRandomly();
   }
 
   restart() {
@@ -34,12 +19,12 @@ export class Game {
     this.opponentSea.clear();
   }
 
-  setOrderedPositions() {
-    this.playerSea.placeOrdered();
+  placePlayerShipsInOrder() {
+    this.playerSea.placeInOrder();
   }
 
-  setRandomPositions() {
-    this.opponentSea.placeRandom();
+  placeOpponentShipsRandomly() {
+    this.opponentSea.placeRandomly();
   }
 
   hit(row: Row, column: Column, seaIndex: SeaIndex) {
