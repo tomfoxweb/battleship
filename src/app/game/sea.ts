@@ -28,6 +28,7 @@ export class Sea {
   private gameMap: Cell[][];
   private ships: Ship[];
   private shipMap: (Ship | null)[][];
+  private readonly shipSizes = [4, 3, 3, 2, 2, 2, 1, 1, 1, 1];
 
   constructor(view: Viewable, seaIndex: SeaIndex) {
     this.view = view;
@@ -92,5 +93,88 @@ export class Sea {
         this.view.showSunkCell(position.row, position.column, this.seaIndex);
       });
     }
+  }
+
+  placeRandom() {
+    this.shipSizes.forEach((size) => {
+      const positions = this.calcRandomShipPositions(size);
+      const randIndex = Math.trunc(Math.random() * positions.length);
+      const randPositions = positions[randIndex];
+      this.addShip(randPositions);
+    });
+  }
+
+  calcRandomShipPositions(shipSize: number): Position[][] {
+    const horizontalPositions = this.calcRandomHorizontalPositions(shipSize);
+    const verticalPositions = this.calcRandomVerticalPositions(shipSize);
+    return horizontalPositions.concat(verticalPositions);
+  }
+
+  calcRandomHorizontalPositions(shipSize: number): Position[][] {
+    const positions: Position[][] = [];
+    for (let row = 0; row < ROW_COUNT; row++) {
+      for (let col = 0; col <= COLUMN_COUNT - shipSize; col++) {
+        let goodPosition = true;
+        const currPositions: Position[] = [];
+        for (let i = 0; i < shipSize; i++) {
+          const currRow: Row = row as Row;
+          const currCol: Column = (col + i) as Column;
+          currPositions.push({ row: currRow, column: currCol });
+          if (!this.canPlaceShip(currRow, currCol)) {
+            goodPosition = false;
+            break;
+          }
+        }
+        if (goodPosition) {
+          positions.push(currPositions);
+        }
+      }
+    }
+    return positions;
+  }
+
+  calcRandomVerticalPositions(shipSize: number): Position[][] {
+    const positions: Position[][] = [];
+    for (let row = 0; row <= ROW_COUNT - shipSize; row++) {
+      for (let col = 0; col < COLUMN_COUNT; col++) {
+        let goodPosition = true;
+        const currPositions: Position[] = [];
+        for (let i = 0; i < shipSize; i++) {
+          const currRow: Row = (row + i) as Row;
+          const currCol: Column = col as Column;
+          currPositions.push({ row: currRow, column: currCol });
+          if (!this.canPlaceShip(currRow, currCol)) {
+            goodPosition = false;
+            break;
+          }
+        }
+        if (goodPosition) {
+          positions.push(currPositions);
+        }
+      }
+    }
+    return positions;
+  }
+
+  private canPlaceShip(rowStart: Row, columnStart: Column): boolean {
+    const aroundPositions: Position[] = [];
+    for (let row = rowStart - 1; row <= rowStart + 1; row++) {
+      for (let col = columnStart - 1; col <= columnStart + 1; col++) {
+        if (this.isPositionOnMap(row, col)) {
+          aroundPositions.push({ row: row as Row, column: col as Column });
+        }
+      }
+    }
+    return aroundPositions.every((x) => this.shipMap[x.row][x.column] === null);
+  }
+
+  private isPositionOnMap(row: number, column: number) {
+    if (row < 0 || row >= ROW_COUNT) {
+      return false;
+    }
+    if (column < 0 || column >= COLUMN_COUNT) {
+      return false;
+    }
+    return true;
   }
 }

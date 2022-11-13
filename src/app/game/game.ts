@@ -26,22 +26,7 @@ export class Game {
       { row: 5, column: 7 },
       { row: 5, column: 8 },
     ]);
-    this.opponentSea.addShip([{ row: 5, column: 5 }]);
-    this.opponentSea.addShip([
-      { row: 2, column: 2 },
-      { row: 2, column: 3 },
-    ]);
-    this.opponentSea.addShip([
-      { row: 6, column: 7 },
-      { row: 7, column: 7 },
-      { row: 8, column: 7 },
-    ]);
-    this.opponentSea.addShip([
-      { row: 4, column: 2 },
-      { row: 5, column: 2 },
-      { row: 6, column: 2 },
-      { row: 7, column: 2 },
-    ]);
+    this.opponentSea.placeRandom();
   }
 
   restart() {
