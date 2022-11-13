@@ -47,8 +47,19 @@ export class AppComponent implements OnInit, Viewable {
       }
     }
     await this.imageProvider.loadImages();
-    const oceanImageUrl = this.imageProvider.getImage(GameImageType.ocean);
     this.game = new Game(this);
+  }
+
+  setOrderedPositions() {
+    if (this.game) {
+      this.game.setOrderedPositions();
+    }
+  }
+
+  setRandomPositions() {
+    if (this.game) {
+      this.game.setRandomPositions();
+    }
   }
 
   hit(row: Row, column: Column, seaIndex: SeaIndex) {

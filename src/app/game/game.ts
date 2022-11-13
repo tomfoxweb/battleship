@@ -34,6 +34,14 @@ export class Game {
     this.opponentSea.clear();
   }
 
+  setOrderedPositions() {
+    this.playerSea.placeOrdered();
+  }
+
+  setRandomPositions() {
+    this.opponentSea.placeRandom();
+  }
+
   hit(row: Row, column: Column, seaIndex: SeaIndex) {
     if (seaIndex === 0) {
       this.playerSea.hit(row, column);

@@ -7,32 +7,44 @@ $content-max-width: 1200px;
   grid-template-columns: repeat(2, 1fr);
   gap: 1em;
 
-  .map-container {
+  .player-container {
     display: grid;
-    grid-template-columns: repeat(10, 1fr);
-    justify-content: center;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr auto;
+    gap: 1em;
 
     button {
-      margin: 0;
-      padding: 0;
-      cursor: pointer;
-      border: none;
-      border-right: 1px solid gold;
-      border-bottom: 1px solid gold;
+      justify-self: center;
+      padding: 0.5em 1em;
+    }
+
+    .map-container {
       display: grid;
-      grid-template-columns: 1fr;
-      grid-template-rows: 1fr;
+      grid-template-columns: repeat(10, 1fr);
+      justify-content: center;
 
-      div {
-        grid-column: 1;
-        grid-row: 1;
+      button {
+        margin: 0;
+        padding: 0;
+        cursor: pointer;
+        border: none;
+        border-right: 1px solid gold;
+        border-bottom: 1px solid gold;
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr;
 
-        img {
-          display: block;
-          width: 100%;
-          height: 100%;
-          margin: 0;
-          padding: 0;
+        div {
+          grid-column: 1;
+          grid-row: 1;
+
+          img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+          }
         }
       }
     }

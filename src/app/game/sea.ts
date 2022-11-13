@@ -95,7 +95,44 @@ export class Sea {
     }
   }
 
+  placeOrdered() {
+    this.clear();
+    this.addShip([
+      { row: 1, column: 1 },
+      { row: 1, column: 2 },
+      { row: 1, column: 3 },
+      { row: 1, column: 4 },
+    ]);
+    this.addShip([
+      { row: 3, column: 1 },
+      { row: 3, column: 2 },
+      { row: 3, column: 3 },
+    ]);
+    this.addShip([
+      { row: 3, column: 5 },
+      { row: 3, column: 6 },
+      { row: 3, column: 7 },
+    ]);
+    this.addShip([
+      { row: 5, column: 1 },
+      { row: 5, column: 2 },
+    ]);
+    this.addShip([
+      { row: 5, column: 4 },
+      { row: 5, column: 5 },
+    ]);
+    this.addShip([
+      { row: 5, column: 7 },
+      { row: 5, column: 8 },
+    ]);
+    this.addShip([{ row: 7, column: 1 }]);
+    this.addShip([{ row: 7, column: 3 }]);
+    this.addShip([{ row: 7, column: 5 }]);
+    this.addShip([{ row: 7, column: 7 }]);
+  }
+
   placeRandom() {
+    this.clear();
     this.shipSizes.forEach((size) => {
       const positions = this.calcRandomShipPositions(size);
       const randIndex = Math.trunc(Math.random() * positions.length);
