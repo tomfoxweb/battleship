@@ -151,18 +151,18 @@ export class Sea {
     const positions: Position[][] = [];
     for (let row = 0; row < ROW_COUNT; row++) {
       for (let col = 0; col <= COLUMN_COUNT - shipSize; col++) {
-        let goodPosition = true;
+        let placeablePosition = true;
         const currPositions: Position[] = [];
         for (let i = 0; i < shipSize; i++) {
           const currRow: Row = row as Row;
           const currCol: Column = (col + i) as Column;
           currPositions.push({ row: currRow, column: currCol });
           if (!this.isPlaceablePosition(currRow, currCol)) {
-            goodPosition = false;
+            placeablePosition = false;
             break;
           }
         }
-        if (goodPosition) {
+        if (placeablePosition) {
           positions.push(currPositions);
         }
       }
